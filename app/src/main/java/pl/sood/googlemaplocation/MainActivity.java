@@ -7,7 +7,6 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -15,13 +14,10 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
@@ -72,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void getCurrentLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.i(TAG, String.valueOf("Brak uprawnień"));
+            Log.i(TAG, "Brak uprawnień");
             return;
         }
         Task<Location> task = client.getLastLocation();
@@ -82,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
                     LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                     GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
                     saveUserLocation(geoPoint);
-                    Log.i(TAG, String.valueOf("Lokalizacja" + geoPoint));
+                    Log.i(TAG, "Lokalizacja" + geoPoint);
 
                     MarkerOptions options = new MarkerOptions().position(latLng)
                             .title("Jestem tutaj");
@@ -103,18 +99,8 @@ public class MainActivity extends AppCompatActivity {
 
         db.collection("localizations").document("LA")
                 .set(userLocation)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "DocumentSnapshot successfully written!");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error writing document", e);
-                    }
-                });
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully written!"))
+                .addOnFailureListener((OnFailureListener) e -> Log.w(TAG, "Error writing document", e));
     }
 
 }
